@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Рельеф без потерь</title>
+<meta name="description" content="Программа на 9 недель: убрать жир, сохранив силу и мышцы. Для 47 лет и тридцатилетнего стажа.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+
+<style>
+/* ---------- reset ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body, h1, h2, h3, p, ul, figure { margin: 0; }
+
+ul { padding: 0; }
+
+table { border-collapse: collapse; }
+
+/* ---------- tokens ---------- */
+
+:root {
+  --bg:        #EDF0F2;
+  --surface:   #FFFFFF;
+  --surface-2: #E3E8EC;
+  --ink:       #12171B;
+  --ink-2:     #47535D;
+  --ink-3:     #7B8893;
+  --line:      #D3DAE0;
+  --line-2:    #BEC8D0;
+  --accent:    #1A5C9E;
+  --accent-2:  #D8E5F1;
+  --hot:       #B0342C;
+  --hot-2:     #F5DFDD;
+  --good:      #2C7355;
+  --good-2:    #D9EBE3;
+  --shadow:    0 1px 2px rgba(18,23,27,.06), 0 6px 18px -10px rgba(18,23,27,.22);
+
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body:    "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #0D1116;
+    --surface:   #151B21;
+    --surface-2: #1D252D;
+    --ink:       #E5EAEF;
+    --ink-2:     #9CA9B5;
+    --ink-3:     #6A7784;
+    --line:      #29323B;
+    --line-2:    #384450;
+    --accent:    #5D9FDC;
+    --accent-2:  #15293B;
+    --hot:       #E2695F;
+    --hot-2:     #2E1B19;
+    --good:      #5CBB90;
+    --good-2:    #14291F;
+    --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:        #0D1116;
+  --surface:   #151B21;
+  --surface-2: #1D252D;
+  --ink:       #E5EAEF;
+  --ink-2:     #9CA9B5;
+  --ink-3:     #6A7784;
+  --line:      #29323B;
+  --line-2:    #384450;
+  --accent:    #5D9FDC;
+  --accent-2:  #15293B;
+  --hot:       #E2695F;
+  --hot-2:     #2E1B19;
+  --good:      #5CBB90;
+  --good-2:    #14291F;
+  --shadow:    0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.7);
+}
+
+/* ---------- base ---------- */
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px 96px;
+}
+
+h1, h2, h3 {
+  font-family: var(--f-display);
+  text-wrap: balance;
+  line-height: 1.1;
+}
+
+h1 { font-size: clamp(2.4rem, 9vw, 3.6rem); font-weight: 800; letter-spacing: -.03em; }
+h2 { font-size: clamp(1.5rem, 5vw, 1.9rem); font-weight: 700; letter-spacing: -.02em; }
+h3 { font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+
+.eyebrow {
+  font-family: var(--f-mono);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.lede { font-size: 1.06rem; color: var(--ink-2); max-width: 60ch; }
+
+.fine { font-size: .85rem; color: var(--ink-2); }
+
+strong { font-weight: 600; color: var(--ink); }
+
+/* ---------- header ---------- */
+
+header { padding: 56px 0 34px; display: flex; flex-direction: column; gap: 18px; }
+
+.rule { height: 3px; width: 56px; background: var(--accent); border-radius: 2px; }
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.spec { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
+
+.spec .k {
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.spec .v {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.32rem;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.spec .v span { font-size: .8rem; font-weight: 600; color: var(--ink-2); }
+
+/* ---------- nav ---------- */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  margin: 0 -20px;
+  padding: 9px 20px;
+}
+
+@supports (backdrop-filter: blur(10px)) {
+  nav { background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); }
+}
+
+.navrow {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.navrow::-webkit-scrollbar { display: none; }
+
+nav a, .themebtn {
+  font-family: var(--f-mono);
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ink-2);
+  padding: 6px 11px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: color .12s, background .12s, border-color .12s;
+}
+
+nav a:hover, nav a:focus-visible, .themebtn:hover, .themebtn:focus-visible {
+  color: var(--accent);
+  background: var(--accent-2);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.themebtn {
+  background: none;
+  cursor: pointer;
+  margin-left: auto;
+  font-family: var(--f-mono);
+  border: 1px solid var(--line-2);
+}
+
+/* ---------- sections ---------- */
+
+section { padding-top: 52px; display: flex; flex-direction: column; gap: 18px; scroll-margin-top: 62px; }
+
+.sechead { display: flex; flex-direction: column; gap: 6px; }
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card-head {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--surface-2);
+}
+
+.card-head .title { display: flex; flex-direction: column; gap: 2px; }
+
+.card-head h3 { font-size: 1.15rem; }
+
+.daytag {
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.card-head .meta {
+  font-family: var(--f-mono);
+  font-size: .74rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-body { padding: 6px 18px 18px; }
+
+.card-foot {
+  padding: 14px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: .88rem;
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ---------- exercise rows ---------- */
+
+.ex { display: flex; flex-direction: column; gap: 3px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+
+.ex:last-child { border-bottom: none; padding-bottom: 2px; }
+
+.ex-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+
+.ex-name { font-weight: 600; font-size: .99rem; line-height: 1.35; }
+
+.ex-load {
+  font-family: var(--f-mono);
+  font-weight: 600;
+  font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.ex-load.bw { color: var(--ink-3); font-size: .86rem; font-weight: 500; }
+
+.ex-meta {
+  font-family: var(--f-mono);
+  font-size: .78rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 9px;
+  align-items: center;
+}
+
+.ex-meta .scheme { color: var(--ink-2); font-weight: 600; }
+
+.ex-note {
+  font-size: .84rem;
+  color: var(--ink-2);
+  line-height: 1.45;
+  margin-top: 3px;
+  padding-left: 10px;
+  border-left: 2px solid var(--line-2);
+}
+
+/* ---------- tables ---------- */
+
+.tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+table { width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+
+th {
+  font-family: var(--f-mono);
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: left;
+  font-weight: 600;
+  padding: 0 12px 9px 0;
+  border-bottom: 1px solid var(--line-2);
+  white-space: nowrap;
+}
+
+td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+
+tbody tr:last-child td { border-bottom: none; }
+
+td.n { font-family: var(--f-mono); font-weight: 600; white-space: nowrap; }
+
+td.hit { color: var(--good); }
+td.miss { color: var(--ink-3); }
+
+.pill {
+  display: inline-block;
+  font-family: var(--f-mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.pill.ok   { background: var(--good-2);   color: var(--good); }
+.pill.warn { background: var(--hot-2);    color: var(--hot); }
+.pill.new  { background: var(--accent-2); color: var(--accent); }
+
+/* ---------- week grid ---------- */
+
+.weeks { display: grid; grid-template-columns: repeat(auto-fit, minmax(74px, 1fr)); gap: 8px; }
+
+.wk {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 11px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.wk .n { font-family: var(--f-mono); font-size: .68rem; font-weight: 600; letter-spacing: .08em; color: var(--ink-3); }
+
+.wk .lab { font-family: var(--f-display); font-weight: 700; font-size: .92rem; letter-spacing: -.01em; line-height: 1.2; }
+
+.wk.deload { border-color: var(--hot); background: var(--hot-2); }
+.wk.deload .lab, .wk.deload .n { color: var(--hot); }
+.wk.test { border-color: var(--accent); background: var(--accent-2); }
+.wk.test .lab, .wk.test .n { color: var(--accent); }
+
+/* ---------- callouts ---------- */
+
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-2);
+  border-radius: 0 9px 9px 0;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: .93rem;
+  color: var(--ink-2);
+}
+
+.note.red { border-left-color: var(--hot); background: var(--hot-2); }
+
+.note h3 { color: var(--ink); }
+
+.note ul { padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+
+/* ---------- fix list ---------- */
+
+.fixes {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  overflow: hidden;
+}
+
+.fix { background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+
+.fix .q { font-weight: 600; font-size: .95rem; }
+
+.fix .a { font-size: .89rem; color: var(--ink-2); }
+
+/* ---------- rule box (progression) ---------- */
+
+.rulebox {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 20px 18px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rulebox .big {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+  letter-spacing: -.02em;
+  line-height: 1.3;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.rulebox .big em { font-style: normal; color: var(--accent); }
+
+.rulebox .sub { font-size: .87rem; color: var(--ink-2); }
+
+/* ---------- decode strip ---------- */
+
+.decode { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }
+
+.decode-row { background: var(--surface); padding: 13px 16px; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+
+.decode-row .code {
+  font-family: var(--f-mono);
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--accent);
+  background: var(--accent-2);
+  padding: 3px 9px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.decode-row .what { font-size: .9rem; color: var(--ink-2); flex: 1 1 240px; }
+
+footer {
+  margin-top: 64px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-family: var(--f-mono);
+  font-size: .76rem;
+  color: var(--ink-3);
+  line-height: 1.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header>
+  <div class="rule"></div>
+  <div>
+    <p class="eyebrow">Программа на 9 недель &middot; сентябрь — ноябрь</p>
+    <h1>Рельеф без потерь</h1>
+  </div>
+  <p class="lede">Три тренировки в неделю. Задача — убрать живот, не потеряв при этом ни силы, ни мышц, набранных за тридцать лет.</p>
+  <div class="specs">
+    <div class="spec"><span class="k">Сейчас</span><span class="v">89 <span>кг · 183 см</span></span></div>
+    <div class="spec"><span class="k">Возраст</span><span class="v">47 <span>лет</span></span></div>
+    <div class="spec"><span class="k">Стаж</span><span class="v">30 <span>лет</span></span></div>
+    <div class="spec"><span class="k">Темп</span><span class="v">−0.5 <span>кг / нед</span></span></div>
+  </div>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a href="#main">Главное</a>
+    <a href="#progress">Прогрессия</a>
+    <a href="#mon">Пн</a>
+    <a href="#wed">Ср</a>
+    <a href="#fri">Пт</a>
+    <a href="#cardio">Кардио</a>
+    <a href="#control">Контроль</a>
+    <a href="#age">Про возраст</a>
+    <a href="#fix">Если что</a>
+    <button class="themebtn" id="theme" type="button" aria-label="Переключить тему">Тема</button>
+  </div>
+</nav>
+
+<section id="main">
+  <div class="sechead">
+    <p class="eyebrow">С этого стоит начать</p>
+    <h2>Главное про рельеф</h2>
+  </div>
+
+  <div class="rulebox">
+    <p class="big">Рельеф делается <em>дефицитом калорий</em>, а не количеством повторений</p>
+    <p class="sub">Тренировка в этом уравнении отвечает не за то, сколько жира уйдёт, а за то, сколько мышц останется</p>
+  </div>
+
+  <p class="lede">Самый живучий миф в зале — что для «сушки» надо взять вес полегче и делать по 20 повторений. Разберём, почему это не работает, потому что от этого зависит вся логика программы ниже.</p>
+
+  <h3>Три вещи, которые стоит знать</h3>
+
+  <div class="fixes">
+    <div class="fix">
+      <p class="q">Локального жиросжигания не существует</p>
+      <p class="a">Нельзя убрать жир именно с живота, качая пресс. Тело забирает жир отовсюду сразу, по своей генетической очереди — а живот у мужчин почти всегда уходит последним. Сто скручиваний дадут крепкий пресс под слоем жира, и никто его не увидит.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Многоповторка не «сушит»</p>
+      <p class="a">Подход на 20 повторений с лёгким весом сжигает примерно столько же калорий, сколько подход на 8 с тяжёлым — разница в пределах погрешности и полностью теряется на фоне съеденного за день. Ощущение жжения и пота — это не жиросжигание, это накопление молочной кислоты.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Тяжёлые веса в дефиците — это защита мышц</p>
+      <p class="a">Когда калорий не хватает, тело ищет, что можно разобрать на топливо. Мышцы — дорогая ткань, и если они не нагружаются серьёзно, организм считает их лишними и пускает в расход. Тяжёлый подход — это сигнал «эти мышцы нужны, жги что-нибудь другое». Убрав веса, вы своими руками отдаёте то, ради чего всё и затевалось.</p>
+    </div>
+  </div>
+
+  <div class="note">
+    <h3>Что из этого следует для программы</h3>
+    <p>Ниже — <strong>те же упражнения, те же веса и те же диапазоны повторений</strong>, что и в обычной массонаборной программе. Меняется не зал, а тарелка и правило, по которому оценивается прогресс.</p>
+    <p>Единственные отличия в зале: объём чуть выше (вы и так делаете больше подходов), изоляция в диапазонах помягче для суставов, и кардио получает больше внимания.</p>
+  </div>
+</section>
+
+<section id="progress">
+  <div class="sechead">
+    <p class="eyebrow">Ключевой раздел</p>
+    <h2>Как считать прогресс в дефиците</h2>
+  </div>
+
+  <p class="lede">В дефиците калорий силовые почти не растут — телу не из чего строить. Это нормально и это не провал. Но тогда обычное правило «добавил вес — молодец» перестаёт работать, и нужно другое.</p>
+
+  <div class="rulebox">
+    <p class="big">Вес на штанге <em>стоит на месте</em>, а вес тела падает — это и есть прогресс</p>
+    <p class="sub">Удержание силовых при уходящих килограммах означает, что уходит именно жир</p>
+  </div>
+
+  <h3>Как это читать по неделям</h3>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Что происходит</th><th>Вес тела</th><th>Жим лёжа</th><th>Вывод</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Идеальный сценарий</td><td class="n hit">89 → 87</td><td class="n hit">75 держится</td><td>Уходит жир, мышцы целы</td></tr>
+        <tr><td>Дефицит слишком мягкий</td><td class="n miss">89 → 88.8</td><td class="n hit">75 растёт</td><td>Убавить еду</td></tr>
+        <tr><td>Дефицит слишком жёсткий</td><td class="n">89 → 86</td><td class="n miss">75 → 67</td><td>Уходят мышцы, добавить еду</td></tr>
+        <tr><td>Застой</td><td class="n miss">89 → 89</td><td class="n">75 держится</td><td>Пересмотреть питание</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note red">
+    <h3>Главный сигнал тревоги</h3>
+    <p>Если рабочие веса начали заметно падать — <strong>больше чем на 5% за месяц</strong> — дефицит слишком агрессивный. Это уже не жиросжигание, а разбор мышц. Решение простое: добавить еды и замедлить темп потери веса.</p>
+    <p>Быстрое похудение выглядит соблазнительно на весах, но результат в зеркале получается хуже: человек становится меньше, а не рельефнее.</p>
+  </div>
+
+  <h3>Диапазоны повторений</h3>
+  <p>Они те же, что и в обычной программе. Работать нужно до состояния, когда в запасе остаётся 1–2 повторения — не до полного отказа, особенно в базовых движениях.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Тип упражнения</th><th>Повторы</th><th>Логика</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>База: присед, жим лёжа, тяга</td><td class="n">5–8</td><td>Держит силу и защищает мышцы</td></tr>
+        <tr><td>Тренажёры на ноги и спину</td><td class="n">10–12</td><td>Объём без нагрузки на суставы</td></tr>
+        <tr><td>Изоляция: махи, руки, дельты</td><td class="n">12–15</td><td>Мягче для локтей и плеч</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="mon">
+  <div class="sechead">
+    <p class="eyebrow">Тренировка 1 из 3</p>
+    <h2>Понедельник · Низ + руки</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="title">
+        <span class="daytag">Пн</span>
+        <h3>Ноги, икры, руки</h3>
+      </div>
+      <span class="meta">29 сетов · ~80 мин + бег</span>
+    </div>
+    <div class="card-body">
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Присед со штангой</span><span class="ex-load">рабочий</span></div>
+        <div class="ex-meta"><span class="scheme">5 × 5</span><span>отдых 3 мин</span></div>
+        <p class="ex-note">При тридцатилетнем стаже техника не обсуждается — берите привычный рабочий вес сразу. Если колени просят пощады, замените на гакк-присед: разница в стимуле минимальная, нагрузка на сустав заметно ниже.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Жим ногами, стопы высоко и узко</span><span class="ex-load">120 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 2 мин</span></div>
+        <p class="ex-note">Стопы выше середины платформы и ближе друг к другу. Такая постановка уводит нагрузку с квадрицепса на ягодицы и заднюю поверхность бедра.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Сгибание ног лёжа</span><span class="ex-load bw">подобрать</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 90 с</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Подъём на носки стоя</span><span class="ex-load">60 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 60 с</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Махи гантелями в стороны</span><span class="ex-load">8 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 15</span><span>отдых 60 с</span></div>
+        <p class="ex-note">Средняя дельта визуально расширяет плечи, а широкие плечи делают талию у́же — при работе над животом это даёт результат раньше, чем сам живот успевает уйти.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Французский жим EZ лёжа</span><span class="ex-load">25 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 90 с</span></div>
+        <p class="ex-note">Диапазон повыше, чем у сына, — локтевой сустав в этом движении нагружается специфически, и 12 повторений он переносит легче, чем 8.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Подъём на бицепс со штангой</span><span class="ex-load">32 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 90 с</span></div>
+      </div>
+
+    </div>
+    <div class="card-foot">
+      <p><strong>Разминка:</strong> 8–10 минут лёгкого бега, затем подводящие подходы в приседе.</p>
+      <p><strong>После:</strong> 20 минут спокойного бега.</p>
+    </div>
+  </div>
+</section>
+
+<section id="wed">
+  <div class="sechead">
+    <p class="eyebrow">Тренировка 2 из 3</p>
+    <h2>Среда · Верх, жим</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="title">
+        <span class="daytag">Ср</span>
+        <h3>Грудь, плечи, спина, трицепс</h3>
+      </div>
+      <span class="meta">29 сетов · ~80 мин + бег</span>
+    </div>
+    <div class="card-body">
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Жим лёжа</span><span class="ex-load">75 кг</span></div>
+        <div class="ex-meta"><span class="scheme">5 × 6</span><span>отдых 3 мин</span></div>
+        <p class="ex-note">Главный контрольный прибор всей программы. Пока этот вес держится — дефицит настроен правильно. Как только поехал вниз, смотрите раздел «Контроль».</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Подтягивания</span><span class="ex-load bw">свой вес</span></div>
+        <div class="ex-meta"><span class="scheme">4 × максимум</span><span>отдых 3 мин</span></div>
+        <p class="ex-note">Приятный побочный эффект похудения: каждый ушедший килограмм — это килограмм, который не надо тянуть вверх. Количество повторений будет расти само по себе, даже без прибавки силы. Хороший показатель, чтобы отслеживать прогресс.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Жим гантелей сидя</span><span class="ex-load">18 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 2 мин</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Тяга горизонтального блока</span><span class="ex-load">55 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 2 мин</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Махи гантелями в стороны</span><span class="ex-load">8 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 15</span><span>отдых 60 с</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Разгибание рук на блоке</span><span class="ex-load">54 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 60 с</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Подъём ног в висе</span><span class="ex-load bw">свой вес</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 15</span><span>отдых 60 с</span></div>
+        <p class="ex-note">Четыре подхода на пресс — этого достаточно. Больше не ускорит уход живота ни на день: пресс здесь тренируется как мышца, а не как средство жиросжигания.</p>
+      </div>
+
+    </div>
+    <div class="card-foot">
+      <p><strong>Разминка:</strong> 8–10 минут лёгкого бега, плечи прокрутить без веса.</p>
+      <p><strong>После:</strong> 20 минут спокойного бега.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fri">
+  <div class="sechead">
+    <p class="eyebrow">Тренировка 3 из 3</p>
+    <h2>Пятница · Низ объём + тяга</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="title">
+        <span class="daytag">Пт</span>
+        <h3>Ноги, спина, задняя дельта</h3>
+      </div>
+      <span class="meta">28 сетов · ~80 мин + бег</span>
+    </div>
+    <div class="card-body">
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Гакк-присед</span><span class="ex-load">50 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 2 мин</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Гиперэкстензия с отягощением</span><span class="ex-load bw">свой вес</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 90 с</span></div>
+        <p class="ex-note">Разгибатели спины, ягодицы и задняя поверхность бедра. В сорок семь это ещё и вложение в поясницу — крепкие разгибатели снимают с неё нагрузку в быту. Своим весом две недели, дальше блин 10–15 кг к груди.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Сгибание ног сидя</span><span class="ex-load">82 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 90 с</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Тяга штанги в наклоне</span><span class="ex-load">50 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 8</span><span>отдых 2 мин</span></div>
+        <p class="ex-note">Если поясница в этот день уже нагружена гиперэкстензией и наклон некомфортен — меняйте на тягу сидя в тренажёре с упором грудью. Стимул спине тот же, позвоночник не участвует.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Жим лёжа на наклонной (гантели)</span><span class="ex-load">20 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 10</span><span>отдых 2 мин</span></div>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Обратная бабочка</span><span class="ex-load">30 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 15</span><span>отдых 60 с</span></div>
+        <p class="ex-note">Задняя дельта разворачивает плечи назад. Это самое дешёвое улучшение осанки из существующих — и визуально работает сразу, ещё до того, как уйдёт вес.</p>
+      </div>
+
+      <div class="ex">
+        <div class="ex-top"><span class="ex-name">Сгибание рук молотком</span><span class="ex-load">10 кг</span></div>
+        <div class="ex-meta"><span class="scheme">4 × 12</span><span>отдых 60 с</span></div>
+      </div>
+
+    </div>
+    <div class="card-foot">
+      <p><strong>Разминка:</strong> 8–10 минут лёгкого бега.</p>
+      <p><strong>После:</strong> 20 минут спокойного бега.</p>
+    </div>
+  </div>
+</section>
+
+<section id="cardio">
+  <div class="sechead">
+    <p class="eyebrow">Здесь у вас всё уже правильно</p>
+    <h2>Кардио</h2>
+  </div>
+
+  <p class="lede">Спокойный ровный темп — именно то, что нужно для этой задачи. Менять ничего не надо, разве что добавить объёма, если позволяет время.</p>
+
+  <div class="note">
+    <h3>Почему спокойный темп лучше интервалов</h3>
+    <p>Интервалы на высоком пульсе жгут больше калорий за минуту, но забирают восстановление у мышц — а в дефиците его и так мало. Спокойный бег даёт почти тот же расход за счёт большей длительности и при этом не конкурирует со штангой.</p>
+    <p>В сорок семь у ровного темпа есть и второй плюс: он не создаёт пиковых нагрузок на сердце и суставы.</p>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Когда</th><th>Что</th><th>Расход</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="n">Пн / Ср / Пт, до</td><td>8–10 мин лёгкого бега</td><td>Разминка</td></tr>
+        <tr><td class="n">Пн / Ср / Пт, после</td><td>20 мин спокойного бега</td><td>~200 ккал за раз</td></tr>
+        <tr><td class="n">По желанию</td><td>Ходьба 30–40 мин в выходной</td><td>~150 ккал, восстановлению не мешает</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="fine">Ориентир по темпу: бежите и можете разговаривать короткими фразами. Если говорить невозможно — слишком быстро для этой задачи.</p>
+</section>
+
+<section id="control">
+  <div class="sechead">
+    <p class="eyebrow">Четыре цифры</p>
+    <h2>Что отслеживать</h2>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Показатель</th><th>Как часто</th><th>Цель</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Вес тела</strong></td><td>Каждое утро, среднее за неделю</td><td class="n">−0.4…0.6 кг / нед</td></tr>
+        <tr><td><strong>Талия</strong></td><td>Раз в 2 недели, утром</td><td class="n">−1 см / мес</td></tr>
+        <tr><td><strong>Жим лёжа</strong></td><td>Каждую среду</td><td class="n">держится</td></tr>
+        <tr><td><strong>Подтягивания</strong></td><td>Каждую среду</td><td class="n">растут</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <h3>Талия важнее весов</h3>
+    <p>Весы показывают сумму всего сразу — воды, содержимого кишечника, гликогена. Сантиметр на талии врёт заметно меньше. Бывают недели, когда вес стоит намертво, а талия уходит: это как раз и есть тот самый обмен жира на мышцы, ради которого всё делается.</p>
+    <p>Мерить в одном и том же месте — на уровне пупка, утром, до еды, не втягивая живот.</p>
+  </div>
+
+  <div class="note">
+    <h3>Реалистичный горизонт</h3>
+    <p>При −0.5 кг в неделю за 9 недель блока уходит примерно <strong>4–4.5 кг</strong>: 89 → 84–85. Живот к этому моменту заметно поддастся, но полностью, скорее всего, ещё нет — у мужчин он уходит последним. Это не повод торопиться: попытка ускориться вдвое просто съест мышцы, и результат будет хуже.</p>
+  </div>
+</section>
+
+<section id="age">
+  <div class="sechead">
+    <p class="eyebrow">Что меняется с возрастом</p>
+    <h2>Про 47 и тридцать лет стажа</h2>
+  </div>
+
+  <div class="fixes">
+    <div class="fix">
+      <p class="q">Разминка длиннее, чем раньше</p>
+      <p class="a">8–10 минут вместо пяти, и подводящих подходов в базе на один больше. Суставная жидкость с возрастом разогревается медленнее — это единственная реальная поправка на возраст в силовой части.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Техника — ваше преимущество, а не то, что нужно ставить</p>
+      <p class="a">Тридцать лет стажа означают, что можно сразу работать с целевыми весами, без вводных недель. У сына в программе три недели уходят на разучивание приседа — вам это не нужно.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Связки изнашиваются быстрее мышц</p>
+      <p class="a">Мышцы в этом возрасте ещё вполне отзывчивы, а вот плечи в жиме и колени в приседе накапливают износ. Если сустав ноет — уменьшайте амплитуду или вес, а не терпите. Пропущенное упражнение стоит недели, травма плеча — полугода.</p>
+    </div>
+    <div class="fix">
+      <p class="q">В дефиците восстановление хуже</p>
+      <p class="a">Меньше калорий — меньше ресурса на починку. Если к третьей неделе накопилась вялость и веса поехали вниз, режьте объём на четверть: там, где четыре подхода, делайте три. Интенсивность не трогать.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Сон стал важнее еды</p>
+      <p class="a">При дефиците недосып бьёт по двум местам сразу: хуже восстановление и сильнее тяга к еде вечером. Семь-восемь часов дают больше, чем любые добавки.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fix">
+  <div class="sechead">
+    <p class="eyebrow">Заранее</p>
+    <h2>Если что-то пошло не так</h2>
+  </div>
+
+  <div class="fixes">
+    <div class="fix">
+      <p class="q">Вес встал на две недели</p>
+      <p class="a">Сначала проверьте талию — если она уходит, всё в порядке, просто вода. Если стоит и она, дефицит перестал быть дефицитом: тело адаптировалось, надо либо чуть убавить еду, либо добавить прогулок.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Рабочие веса поехали вниз</p>
+      <p class="a">Главный тревожный сигнал. Добавьте еды и замедлите похудение — вы теряете то, ради чего всё и затевалось. Лучше минус 4 кг за девять недель с сохранённой силой, чем минус 8 с провалившимся жимом.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Хочется добавить пресса, чтобы живот ушёл быстрее</p>
+      <p class="a">Не ускорит. Пресс уже есть в программе как мышца, а живот уйдёт от дефицита и ни от чего другого. Те же двадцать минут лучше потратить на ходьбу — расход будет выше.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Кажется, что тренировка слишком лёгкая для сушки</p>
+      <p class="a">Так и должно быть. Ощущение «убился» не коррелирует с потерей жира вообще никак — оно коррелирует с усталостью. Работу делает дефицит, а зал только охраняет мышцы.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Пропустили тренировку</p>
+      <p class="a">Не догонять и не сдваивать. Следующий раз в зале — та тренировка, которая шла по очереди.</p>
+    </div>
+    <div class="fix">
+      <p class="q">Сын делает меньше подходов — может, и мне столько же?</p>
+      <p class="a">У него другая задача и меньше времени: он набирает массу и упирается в 85 минут. Ваш объём выше и это уместно — в дефиците дополнительные подходы помогают удерживать мышцы. Но если восстановление проседает, урезать объём можно без потерь.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  9 недель · сентябрь–ноябрь 2026 · три тренировки в неделю · 89 → 84–85 кг<br>
+  Веса указаны рабочие, уточняются по самочувствию в первые две тренировки.
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('theme');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('theme');
+    if (saved) root.setAttribute('data-theme', saved);
+  } catch (e) {}
+  btn.addEventListener('click', function () {
+    var isDark = root.getAttribute('data-theme') === 'dark';
+    if (!root.hasAttribute('data-theme')) {
+      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    var next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
